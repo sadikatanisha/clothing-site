@@ -32,19 +32,25 @@ const Navbar = () => {
             to="/"
             className="hover:text-[#D98581] transition duration-300"
           >
-            About
+            All Products
           </NavLink>
           <NavLink
             to="/"
             className="hover:text-[#D98581] transition duration-300"
           >
-            Products
+            Categories
           </NavLink>
           <NavLink
             to="/"
             className="hover:text-[#D98581] transition duration-300"
           >
-            Services
+            Offer
+          </NavLink>
+          <NavLink
+            to="/"
+            className="hover:text-[#D98581] transition duration-300"
+          >
+            Customize
           </NavLink>
         </div>
 
