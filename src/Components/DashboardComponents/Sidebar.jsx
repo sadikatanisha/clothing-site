@@ -14,10 +14,14 @@ const sidebarMenu = {
     { name: "Settings", path: "settings", icon: <CiSettings /> },
   ],
   admin: [
+    { name: "Add Product", path: "add-product", icon: <CiBoxList /> },
+    { name: "Discounts", path: "manage-discounts", icon: <CiBoxList /> },
     { name: "Manage Users", path: "manage-users", icon: <AiOutlineUser /> },
+    { name: "Inventory", path: "inventory", icon: <CiBoxList /> },
     { name: "Manage Products", path: "manage-products", icon: <CiBoxList /> },
     { name: "Manage Orders", path: "manage-orders", icon: <CiBoxList /> },
-    { name: "Manage Reports", path: "reports", icon: <FiBarChart /> },
+    { name: "Manage Content", path: "manage-content", icon: <CiBoxList /> },
+    { name: "Reports", path: "reports", icon: <FiBarChart /> },
     { name: "Settings", path: "settings", icon: <CiSettings /> },
   ],
 };

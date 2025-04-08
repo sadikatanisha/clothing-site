@@ -10,7 +10,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100 ">
       {/* Sidebar */}
       <Sidebar
         userRole="admin"
@@ -22,7 +22,7 @@ const Dashboard = () => {
       <div className="flex-1">
         {/* <DashboardNav handleDrawerToggle={handleDrawerToggle} /> */}
 
-        <div className="p-6 mt-20">
+        <div className="pl-16 ">
           <Outlet />
         </div>
       </div>

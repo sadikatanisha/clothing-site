@@ -1,7 +1,7 @@
 import React from "react";
 
-const ManageUser = () => {
+const ManageUsers = () => {
   return <div>ManageUser</div>;
 };
 
-export default ManageUser;
+export default ManageUsers;
