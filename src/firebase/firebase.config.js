@@ -6,16 +6,15 @@ import {
   setPersistence,
   browserLocalPersistence,
 } from "firebase/auth";
-// TODO: Add SDKs for Firebase products that you want to use
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAXZMkU0QJfH-b5TL8Ery8tDVemHyCCUJM",
-  authDomain: "sm-clothing-37a79.firebaseapp.com",
-  projectId: "sm-clothing-37a79",
-  storageBucket: "sm-clothing-37a79.firebasestorage.app",
-  messagingSenderId: "567864962115",
-  appId: "1:567864962115:web:41274065cf094cc79a38f6",
-  measurementId: "G-HE49JN7WF1",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
