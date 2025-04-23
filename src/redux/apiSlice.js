@@ -16,7 +16,7 @@ export const apiSlice = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Product"],
+  tagTypes: ["Product", "Users"],
   endpoints: (builder) => ({
     signup: builder.mutation({
       query: (userData) => ({
@@ -73,6 +73,14 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: (result, error, { id }) => [{ type: "Product", id }],
     }),
+    toggleFeatured: builder.mutation({
+      query: ({ featured, id }) => ({
+        url: `/admin/products/${id}/toggle-featured`,
+        method: "PATCH",
+        body: { featured },
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: "Product", id }],
+    }),
     deleteProduct: builder.mutation({
       query: (id) => ({
         url: `/admin/delete-product/${id}`,
@@ -87,14 +95,65 @@ export const apiSlice = createApi({
         { type: "Product", id: "LIST" },
       ],
     }),
+    // USER
+    getAllUsers: builder.query({
+      query: () => "/admin/users",
+      providesTags: (result = []) => [
+        ...result.map((user) => ({ type: "Users", id: user._id })),
+        { type: "Users", id: "LIST" },
+      ],
+    }),
+    updateUserRole: builder.mutation({
+      query: ({ id, role }) => ({
+        url: `/admin/users/${id}/role`,
+        method: "PATCH",
+        body: { role },
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Users", id },
+        { type: "Users", id: "LIST" },
+      ],
+    }),
+
+    // Banner
+    getBanner: builder.query({
+      query: () => `/admin/get-banner`,
+    }),
+    getBannerById: builder.query({
+      query: (id) => `/admin/get-banner/${id}`,
+    }),
+    createBanner: builder.mutation({
+      query: (formData) => ({
+        url: "/admin/create-banner",
+        method: "POST",
+        body: formData,
+      }),
+    }),
+    updateBanner: builder.mutation({
+      query: ({ id, formData }) => ({
+        url: `/update-banner/${id}`,
+        method: "PATCH",
+        body: formData,
+      }),
+    }),
   }),
 });
 
 export const {
   useSignupMutation,
   useLoginMutation,
+  // ADMIN product
   useCreateProductMutation,
   useUpdateProductMutation,
+  useToggleFeaturedMutation,
   useDeleteProductMutation,
   useGetAdminProductsQuery,
+  // Users
+  useGetAllUsersQuery,
+  useUpdateUserRoleMutation,
+
+  useCreateBannerMutation,
+  useUpdateBannerMutation,
+  useGetBannerQuery,
+  useGetBannerByIdQuery,
 } = apiSlice;

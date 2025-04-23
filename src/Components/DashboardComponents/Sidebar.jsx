@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { FiChevronLeft, FiChevronRight, FiBarChart } from "react-icons/fi";
-import { AiOutlineUser } from "react-icons/ai";
-import { CiSettings, CiMedal, CiBoxList } from "react-icons/ci";
+import { CiSettings, CiMedal, CiBoxList, CiCirclePlus } from "react-icons/ci";
 import { SlHome } from "react-icons/sl";
 import { GoHistory } from "react-icons/go";
 import { Link, useLocation } from "react-router-dom";
+import { PiConfetti } from "react-icons/pi";
+import { IoPersonOutline } from "react-icons/io5";
+import { AiOutlineProduct } from "react-icons/ai";
+import { BsBox } from "react-icons/bs";
+import { BiCaretRightSquare } from "react-icons/bi";
 
 const sidebarMenu = {
   customer: [
@@ -14,14 +18,20 @@ const sidebarMenu = {
     { name: "Settings", path: "settings", icon: <CiSettings /> },
   ],
   admin: [
-    { name: "Add Product", path: "add-product", icon: <CiBoxList /> },
-    { name: "Discounts", path: "manage-discounts", icon: <CiBoxList /> },
-    { name: "Manage Users", path: "manage-users", icon: <AiOutlineUser /> },
-    { name: "Inventory", path: "inventory", icon: <CiBoxList /> },
-    { name: "Manage Products", path: "manage-products", icon: <CiBoxList /> },
-    { name: "Manage Orders", path: "manage-orders", icon: <CiBoxList /> },
-    { name: "Manage Content", path: "manage-content", icon: <CiBoxList /> },
-    { name: "Reports", path: "reports", icon: <FiBarChart /> },
+    { name: "Add Product", path: "add-product", icon: <CiCirclePlus /> },
+    { name: "Discounts", path: "manage-discounts", icon: <PiConfetti /> },
+    { name: "Manage Users", path: "manage-users", icon: <IoPersonOutline /> },
+    {
+      name: "Manage Products",
+      path: "manage-products",
+      icon: <AiOutlineProduct />,
+    },
+    { name: "Manage Orders", path: "manage-orders", icon: <BsBox /> },
+    {
+      name: "Manage Content",
+      path: "manage-content",
+      icon: <BiCaretRightSquare />,
+    },
     { name: "Settings", path: "settings", icon: <CiSettings /> },
   ],
 };

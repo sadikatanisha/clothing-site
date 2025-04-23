@@ -34,12 +34,13 @@ const AddProduct = () => {
   const [files, setFiles] = useState([]);
   const { getRootProps, getInputProps } = useDropzone({
     accept: "image/*",
-    onDrop: (acceptedFiles) =>
-      setFiles(
-        acceptedFiles.map((file) =>
-          Object.assign(file, { preview: URL.createObjectURL(file) })
-        )
-      ),
+    onDrop: (acceptedFiles) => {
+      const mapped = acceptedFiles.map((file) =>
+        Object.assign(file, { preview: URL.createObjectURL(file) })
+      );
+      // append to existing files instead of overwriting
+      setFiles((prev) => [...prev, ...mapped]);
+    },
   });
 
   const [createProduct, { isLoading, isError, error }] =

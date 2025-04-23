@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 
-// Helper function to generate a slug from the product name
-
-const generateSlug = (name) => {
-  return name
+const generateSlug = (name) =>
+  name
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-");
-};
 
 const UpdateForm = ({
   initialProduct = {},
   onSubmitData,
   submitButtonText,
 }) => {
+  // Core product fields
   const [product, setProduct] = useState({
     name: "",
     slug: "",
@@ -32,43 +30,56 @@ const UpdateForm = ({
     ...initialProduct,
   });
 
-  // For image uploads
-  const [files, setFiles] = useState([]);
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: "image/*",
-    onDrop: (acceptedFiles) =>
-      setFiles(
-        acceptedFiles.map((file) =>
-          Object.assign(file, { preview: URL.createObjectURL(file) })
-        )
-      ),
-  });
+  // Separate state for existing vs new images
+  const [existingImages, setExistingImages] = useState([]);
+  const [newFiles, setNewFiles] = useState([]);
 
-  // Dynamic color inputs: store as an array of objects {name, hex}
+  // Colors & Sizes
   const [colorName, setColorName] = useState("");
   const [colorHex, setColorHex] = useState("");
   const [colors, setColors] = useState(initialProduct.availableColors || []);
-  // Dynamic sizes as an array of strings
   const [sizeInput, setSizeInput] = useState("");
   const [sizes, setSizes] = useState(initialProduct.availableSizes || []);
 
-  // When the initialProduct changes, update state accordingly
+  // Populate initial images
   useEffect(() => {
-    setProduct((prev) => ({
-      ...prev,
-      ...initialProduct,
-    }));
+    if (initialProduct.images) {
+      setExistingImages(
+        initialProduct.images.map((img, idx) => ({
+          // use img.id if available, else fallback to URL
+          id: img.id || img.url || idx,
+          url: img.url,
+        }))
+      );
+    }
+  }, [initialProduct.images]);
+
+  // Sync product when initialProduct changes
+  useEffect(() => {
+    setProduct((prev) => ({ ...prev, ...initialProduct }));
     setColors(initialProduct.availableColors || []);
     setSizes(initialProduct.availableSizes || []);
   }, [initialProduct]);
 
-  // Auto-generate slug if not provided
+  // Auto-generate slug
   useEffect(() => {
     if (product.name && !product.slug) {
       setProduct((prev) => ({ ...prev, slug: generateSlug(prev.name) }));
     }
   }, [product.name, product.slug]);
 
+  // Dropzone: append new files
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: "image/*",
+    onDrop: (accepted) => {
+      const mapped = accepted.map((file) =>
+        Object.assign(file, { preview: URL.createObjectURL(file) })
+      );
+      setNewFiles((prev) => [...prev, ...mapped]);
+    },
+  });
+
+  // Handle field changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setProduct((prev) => ({
@@ -77,76 +88,74 @@ const UpdateForm = ({
     }));
   };
 
-  // Add color with hex value
+  // Color handlers
   const addColor = (e) => {
     e.preventDefault();
+    const name = colorName.trim();
+    const hex = colorHex.trim();
     if (
-      colorName.trim() &&
-      colorHex.trim() &&
+      name &&
+      hex &&
       !colors.some(
-        (color) =>
-          color.name.toLowerCase() === colorName.trim().toLowerCase() &&
-          color.hex.toLowerCase() === colorHex.trim().toLowerCase()
+        (c) =>
+          c.name.toLowerCase() === name.toLowerCase() &&
+          c.hex.toLowerCase() === hex.toLowerCase()
       )
     ) {
-      setColors([...colors, { name: colorName.trim(), hex: colorHex.trim() }]);
+      setColors((prev) => [...prev, { name, hex }]);
       setColorName("");
       setColorHex("");
     }
   };
+  const removeColor = (c) => setColors((prev) => prev.filter((x) => x !== c));
 
-  const removeColor = (colorToRemove) => {
-    setColors(
-      colors.filter(
-        (color) =>
-          !(
-            color.name === colorToRemove.name && color.hex === colorToRemove.hex
-          )
-      )
-    );
-  };
-
-  // Add and remove sizes
+  // Size handlers
   const addSize = (e) => {
     e.preventDefault();
-    if (sizeInput.trim() && !sizes.includes(sizeInput.trim())) {
-      setSizes([...sizes, sizeInput.trim()]);
+    const s = sizeInput.trim();
+    if (s && !sizes.includes(s)) {
+      setSizes((prev) => [...prev, s]);
       setSizeInput("");
     }
   };
+  const removeSize = (s) => setSizes((prev) => prev.filter((x) => x !== s));
 
-  const removeSize = (size) => {
-    setSizes(sizes.filter((s) => s !== size));
-  };
+  // Remove image handlers
+  const removeExisting = (id) =>
+    setExistingImages((prev) => prev.filter((img) => img.id !== id));
+  const removeNew = (name) =>
+    setNewFiles((prev) => prev.filter((file) => file.name !== name));
 
+  // Submit
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Prepare updated product data.
-    const updatedProduct = {
+    const updated = {
       ...product,
-      // Convert dynamic colors to JSON and sizes to comma-separated string.
       availableColors: JSON.stringify(colors),
       availableSizes: sizes.join(","),
     };
-
-    // Prepare FormData for file uploads.
     const formData = new FormData();
-    Object.entries(updatedProduct).forEach(([key, value]) => {
-      formData.append(key, value);
+    Object.entries(updated).forEach(([key, val]) => {
+      // only send real values
+      if (val != null && val !== "") {
+        formData.append(key, val);
+      }
     });
-    files.forEach((file) => {
+    // Include existing image IDs or URLs
+    existingImages.forEach((img) => {
+      formData.append("existingImages", img.id);
+    });
+    // Include only new files
+    newFiles.forEach((file) => {
       formData.append("images", file);
     });
-
     onSubmitData(formData);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Basic fields */}
+      {/* TEXT FIELDS */}
       <input
-        type="text"
         name="name"
         placeholder="Product Name"
         value={product.name}
@@ -155,7 +164,6 @@ const UpdateForm = ({
         required
       />
       <input
-        type="text"
         name="slug"
         placeholder="Slug"
         value={product.slug}
@@ -169,11 +177,10 @@ const UpdateForm = ({
         value={product.description}
         onChange={handleChange}
         className="w-full p-2 border border-gray-200 rounded"
-        rows="4"
+        rows={4}
         required
-      ></textarea>
+      />
       <input
-        type="text"
         name="sku"
         placeholder="SKU"
         value={product.sku}
@@ -199,7 +206,6 @@ const UpdateForm = ({
         className="w-full p-2 border border-gray-200 rounded"
       />
       <input
-        type="text"
         name="category"
         placeholder="Category"
         value={product.category}
@@ -208,7 +214,6 @@ const UpdateForm = ({
         required
       />
       <input
-        type="text"
         name="brand"
         placeholder="Brand"
         value={product.brand}
@@ -224,157 +229,163 @@ const UpdateForm = ({
         className="w-full p-2 border border-gray-200 rounded"
         required
       />
-      <div className="flex items-center space-x-4">
-        <label className="flex items-center space-x-2">
+      <div className="flex space-x-4">
+        <label className="flex items-center">
           <input
             type="checkbox"
             name="isCustomizable"
             checked={product.isCustomizable}
             onChange={handleChange}
-            className="h-4 w-4"
-          />
-          <span>Customizable</span>
+          />{" "}
+          Customizable
         </label>
-        <label className="flex items-center space-x-2">
+        <label className="flex items-center">
           <input
             type="checkbox"
             name="featured"
             checked={product.featured}
             onChange={handleChange}
-            className="h-4 w-4"
-          />
-          <span>Featured Product</span>
+          />{" "}
+          Featured
         </label>
       </div>
-      {/* Dynamic Colors */}
+
+      {/* COLORS */}
       <div>
-        <label className="block mb-1 font-medium">Available Colors</label>
+        <label>Available Colors</label>
         <div className="flex gap-2">
           <input
-            type="text"
             placeholder="Color Name"
             value={colorName}
             onChange={(e) => setColorName(e.target.value)}
-            className="w-full p-2 border border-gray-200 rounded"
+            className="p-2 border border-gray-200 rounded"
           />
           <input
-            type="text"
-            placeholder="Hex Value (e.g., #ff0000)"
+            placeholder="Hex (e.g. #ff0000)"
             value={colorHex}
             onChange={(e) => setColorHex(e.target.value)}
-            className="w-full p-2 border border-gray-200 rounded"
+            className="p-2 border border-gray-200 rounded"
           />
           <button
             onClick={addColor}
-            className="bg-blue-500 text-white px-4 rounded"
+            className="px-4 bg-blue-500 text-white rounded"
           >
             Add
           </button>
         </div>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {colors.map((color, idx) => (
-            <div
-              key={idx}
-              className="bg-gray-200 px-3 py-1 rounded-full flex items-center"
+        <div className="flex flex-wrap gap-2 mt-2">
+          {colors.map((c, i) => (
+            <span
+              key={i}
+              className="px-3 py-1 bg-gray-200 rounded-full flex items-center"
             >
-              <span>
-                {color.name} ({color.hex})
-              </span>
+              {c.name} ({c.hex})
               <button
-                type="button"
-                onClick={() => removeColor(color)}
+                onClick={() => removeColor(c)}
                 className="ml-1 text-red-500"
               >
                 ✖
               </button>
-            </div>
+            </span>
           ))}
         </div>
       </div>
-      {/* Dynamic Sizes */}
+
+      {/* SIZES */}
       <div>
-        <label className="block mb-1 font-medium">Available Sizes</label>
+        <label>Available Sizes</label>
         <div className="flex gap-2">
           <input
-            type="text"
             placeholder="Enter size"
             value={sizeInput}
             onChange={(e) => setSizeInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") addSize(e);
-            }}
-            className="w-full p-2 border border-gray-200 rounded"
+            onKeyDown={(e) => e.key === "Enter" && addSize(e)}
+            className="p-2 border border-gray-200 rounded"
           />
           <button
             onClick={addSize}
-            className="bg-blue-500 text-white px-4 rounded"
+            className="px-4 bg-blue-500 text-white rounded"
           >
             Add
           </button>
         </div>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {sizes.map((size) => (
-            <div
-              key={size}
-              className="bg-gray-200 px-3 py-1 rounded-full flex items-center"
+        <div className="flex flex-wrap gap-2 mt-2">
+          {sizes.map((s) => (
+            <span
+              key={s}
+              className="px-3 py-1 bg-gray-200 rounded-full flex items-center"
             >
-              <span>{size}</span>
+              {s}
               <button
-                type="button"
-                onClick={() => removeSize(size)}
+                onClick={() => removeSize(s)}
                 className="ml-1 text-red-500"
               >
                 ✖
               </button>
-            </div>
+            </span>
           ))}
         </div>
       </div>
-      {/* Tags */}
+
+      {/* TAGS */}
       <input
-        type="text"
         name="tags"
         placeholder="Tags (comma separated)"
         value={product.tags}
         onChange={handleChange}
         className="w-full p-2 border border-gray-200 rounded"
       />
-      {/* Images */}
-      <div className="border-dashed border-2 border-gray-300 p-4 rounded">
-        <div {...getRootProps()} className="cursor-pointer">
-          <input {...getInputProps()} />
-          <p className="text-center text-gray-600">
-            Drag & drop images here, or click to select files
-          </p>
-        </div>
-        {files.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-4">
-            {files.map((file) => (
-              <div key={file.name} className="relative w-24 h-24">
-                <img
-                  src={file.preview}
-                  alt={file.name}
-                  className="w-full h-full object-cover rounded"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFiles((currFiles) =>
-                      currFiles.filter((f) => f.name !== file.name)
-                    );
-                  }}
-                  className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1"
-                >
-                  ✖
-                </button>
-              </div>
-            ))}
+
+      {/* IMAGE PREVIEWS */}
+      <div className="mt-4 flex flex-wrap gap-4">
+        {existingImages.map((img) => (
+          <div key={img.id} className="relative w-24 h-24">
+            <img
+              src={img.url}
+              alt="Existing"
+              className="w-full h-full object-cover rounded"
+            />
+            <button
+              type="button"
+              onClick={() => removeExisting(img.id)}
+              className="absolute top-0 right-0 bg-red-100 text-white text-xs rounded-full p-1"
+            >
+              ✖
+            </button>
           </div>
-        )}
+        ))}
+        {newFiles.map((file) => (
+          <div key={file.name} className="relative w-24 h-24">
+            <img
+              src={file.preview}
+              alt={file.name}
+              className="w-full h-full object-cover rounded"
+            />
+            <button
+              type="button"
+              onClick={() => removeNew(file.name)}
+              className="absolute top-0 right-0 bg-red-100 text-white text-xs rounded-full p-1 "
+            >
+              ✖
+            </button>
+          </div>
+        ))}
       </div>
+
+      {/* DROPZONE */}
+      <div
+        {...getRootProps()}
+        className="border-2  border-gray-400 border-dashed p-4 rounded cursor-pointer"
+      >
+        <input {...getInputProps()} />
+        <p className="text-center">
+          Drag & drop images here, or click to select files
+        </p>
+      </div>
+
       <button
         type="submit"
-        className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
+        className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
       >
         {submitButtonText}
       </button>
