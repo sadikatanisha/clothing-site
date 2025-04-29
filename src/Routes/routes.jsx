@@ -10,6 +10,9 @@ import ManageContent from "../Pages/Dashboard/ManageContent/ManageContent";
 import ManageOrders from "../Pages/Dashboard/Orders/Orders";
 import Dashboard from "../Pages/Dashboard/Dashboard";
 import Settings from "../Pages/Dashboard/Settings/Settings";
+import ProductDetails from "../Pages/ProductDetails/ProductDetails";
+import Checkout from "../Pages/Checkout/Checkout";
+import Cart from "../Pages/Cart/Cart";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -23,6 +26,18 @@ export const router = createBrowserRouter([
       {
         path: "/shop",
         element: <Shop></Shop>,
+      },
+      {
+        path: "/shop/:id",
+        element: <ProductDetails />,
+      },
+      {
+        path: "/cart",
+        element: <Cart />,
+      },
+      {
+        path: "/checkout",
+        element: <Checkout />,
       },
 
       {

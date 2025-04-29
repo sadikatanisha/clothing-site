@@ -57,6 +57,11 @@ export const apiSlice = createApi({
       },
     }),
 
+    // USER
+    getProductDetails: builder.query({
+      query: (id) => `/user/products/${id}`,
+    }),
+
     // ADMIN
     createProduct: builder.mutation({
       query: (formData) => ({
@@ -142,6 +147,8 @@ export const apiSlice = createApi({
 export const {
   useSignupMutation,
   useLoginMutation,
+  // USER
+  useGetProductDetailsQuery,
   // ADMIN product
   useCreateProductMutation,
   useUpdateProductMutation,
