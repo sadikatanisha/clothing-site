@@ -106,7 +106,6 @@ const ManageUsers = () => {
         </table>
       </div>
 
-      {/* Edit Role Modal */}
       {selectedUser && (
         <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md mx-4 p-6">

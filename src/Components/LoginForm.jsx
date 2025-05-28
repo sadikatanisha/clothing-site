@@ -1,26 +1,48 @@
 // LoginForm.js
-import React, { useState } from "react";
-import { useLoginMutation } from "../redux/apiSlice";
+import React, { useState, useContext } from "react";
+import { AuthContext } from "../provider/AuthProvider";
+import { useNavigate, useLocation } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 
 const LoginForm = ({ onClose, onSwitchToSignup }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login, loading } = useContext(AuthContext);
 
-  const [login, { isLoading, error }] = useLoginMutation();
+  const [error, setError] = useState(null);
+
+  const from = location.state?.from?.pathname || "/";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+
     try {
-      await login({ email, password }).unwrap();
+      await login(email, password);
+      toast.success("Logged in successfully!");
+      onClose();
+      navigate(from, { replace: true });
     } catch (err) {
-      console.error("Login failed:", err);
+      console.error("Login failed", err);
+      const msg = err.message || "Login failed";
+      setError(msg);
+      toast.error(msg);
     }
   };
+
+  // 👇 also add email/password state
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg w-96 relative">
       <h2 className="text-2xl font-semibold text-center mb-4">Login</h2>
+      <ToastContainer />
+
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        {error && (
+          <div className="text-red-500 text-sm text-center">{error}</div>
+        )}
         <input
           type="email"
           placeholder="Email"
@@ -39,17 +61,13 @@ const LoginForm = ({ onClose, onSwitchToSignup }) => {
         />
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={loading}
           className="bg-black border-2 text-white py-2 rounded-lg hover:bg-white hover:border-2 hover:text-black transition"
         >
-          {isLoading ? "Logging in..." : "Login"}
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
-      {error && (
-        <p className="text-red-500 mt-2 text-center">
-          {error.data?.error || "Login failed. Please try again."}
-        </p>
-      )}
+
       <div className="mt-4 text-center">
         Don’t have an account?{" "}
         <button
@@ -59,6 +77,7 @@ const LoginForm = ({ onClose, onSwitchToSignup }) => {
           Sign Up
         </button>
       </div>
+
       <button
         className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
         onClick={onClose}

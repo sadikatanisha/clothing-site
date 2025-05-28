@@ -1,67 +1,56 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { setUser } from "./authSlice";
-import { getAuth, signInWithCustomToken } from "firebase/auth";
-import { auth } from "../firebase/firebase.config";
 
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
     baseUrl: "http://localhost:3000/api",
     credentials: "include",
-    prepareHeaders: (headers, { getState }) => {
-      const token = getState().auth?.token;
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem("accessToken");
       if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
+        headers.set("authorization", `Bearer ${token}`);
       }
       return headers;
     },
   }),
-  tagTypes: ["Product", "Users"],
+  tagTypes: ["Product", "Users", "Orders", "Coupons"],
   endpoints: (builder) => ({
-    signup: builder.mutation({
-      query: (userData) => ({
-        url: "/auth/signup",
-        method: "POST",
-        body: userData,
-      }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          const { token: customToken, user: userData } = data;
-
-          // Use the imported auth instance
-          const userCredential = await signInWithCustomToken(auth, customToken);
-          const idToken = await userCredential.user.getIdToken(true);
-          dispatch(setUser({ user: userData, token: idToken }));
-        } catch (error) {
-          console.error("Signup error:", error);
-        }
+    createUserInDB: builder.mutation({
+      query: (payload) => {
+        return {
+          url: "/auth/create-user",
+          method: "POST",
+          body: payload,
+        };
       },
     }),
-    login: builder.mutation({
-      query: (credentials) => ({
-        url: "/auth/login",
-        method: "POST",
-        body: credentials,
-      }),
-      async onQueryStarted({ email, password }, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          const { token: customToken, user: userData } = data;
-          const userCredential = await signInWithCustomToken(auth, customToken);
-          const idToken = await userCredential.user.getIdToken(true);
-          dispatch(setUser({ user: userData, token: idToken }));
-        } catch (error) {
-          console.error("Login error:", error);
-        }
+    getToken: builder.mutation({
+      query: (payload) => {
+        return {
+          url: "/auth/get-token",
+          method: "POST",
+          body: payload,
+        };
       },
     }),
-
+    getMydata: builder.query({
+      query: () => `/user/me`,
+    }),
     // USER
     getProductDetails: builder.query({
       query: (id) => `/user/products/${id}`,
     }),
+    getFeaturedProducts: builder.query({
+      query: () => "/user/featured-products",
+    }),
 
+    createOrder: builder.mutation({
+      query: (formData) => ({
+        url: "/user/create-order",
+        method: "POST",
+        body: formData,
+      }),
+    }),
     // ADMIN
     createProduct: builder.mutation({
       query: (formData) => ({
@@ -100,7 +89,7 @@ export const apiSlice = createApi({
         { type: "Product", id: "LIST" },
       ],
     }),
-    // USER
+
     getAllUsers: builder.query({
       query: () => "/admin/users",
       providesTags: (result = []) => [
@@ -120,6 +109,20 @@ export const apiSlice = createApi({
       ],
     }),
 
+    getAllOrders: builder.query({
+      query: () => `/admin/all-orders/`,
+    }),
+    getOrderDetails: builder.query({
+      query: (id) => `/admin/order-details/${id}`,
+    }),
+    updateOrderStatus: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/admin/update-status/${id}`,
+        method: "PATCH",
+        body: { status },
+      }),
+    }),
+
     // Banner
     getBanner: builder.query({
       query: () => `/admin/get-banner`,
@@ -136,31 +139,86 @@ export const apiSlice = createApi({
     }),
     updateBanner: builder.mutation({
       query: ({ id, formData }) => ({
-        url: `/update-banner/${id}`,
+        url: `/admin/update-banner/${id}`,
         method: "PATCH",
         body: formData,
       }),
+    }),
+    deleteBanner: builder.mutation({
+      query: (id) => ({
+        url: `/admin/delete-banner/${id}`,
+        method: "DELETE",
+      }),
+    }),
+
+    // Coupon --> Admin
+    getAllCoupons: builder.query({
+      query: () => `/admin/coupons`,
+      providesTags: (result = [], error) =>
+        result
+          ? [
+              ...result.map((coupon) => ({ type: "Coupons", id: coupon._id })),
+              { type: "Coupons", id: "LIST" },
+            ]
+          : [{ type: "Coupons", id: "LIST" }],
+    }),
+    createCoupon: builder.mutation({
+      query: (payload) => ({
+        url: `/admin/create-coupon`,
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: [{ type: "Coupons", id: "LIST" }],
+    }),
+    deleteCoupon: builder.mutation({
+      query: (id) => ({
+        url: `/admin/delete-coupon/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: "Coupons", id },
+        { type: "Coupons", id: "LIST" },
+      ],
+    }),
+
+    // Coupon --> User
+    getActiveCoupon: builder.query({
+      query: () => `/user/active-coupon`,
     }),
   }),
 });
 
 export const {
-  useSignupMutation,
-  useLoginMutation,
+  useCreateUserInDBMutation,
+  useGetTokenMutation,
   // USER
   useGetProductDetailsQuery,
+  useGetFeaturedProductsQuery,
+  useCreateOrderMutation,
+  useGetMydataQuery,
   // ADMIN product
   useCreateProductMutation,
   useUpdateProductMutation,
   useToggleFeaturedMutation,
   useDeleteProductMutation,
   useGetAdminProductsQuery,
+
+  useGetAllOrdersQuery,
+  useGetOrderDetailsQuery,
+  useUpdateOrderStatusMutation,
   // Users
   useGetAllUsersQuery,
   useUpdateUserRoleMutation,
-
+  // Banner
   useCreateBannerMutation,
   useUpdateBannerMutation,
+  useDeleteBannerMutation,
   useGetBannerQuery,
   useGetBannerByIdQuery,
+  // Coupon admin
+  useGetAllCouponsQuery,
+  useCreateCouponMutation,
+  useDeleteCouponMutation,
+  // Coupon User
+  useGetActiveCouponQuery,
 } = apiSlice;

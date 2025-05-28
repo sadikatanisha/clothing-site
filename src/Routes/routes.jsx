@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import App from "../App";
 import Home from "../Pages/Home/Home";
 import Shop from "../Pages/Shop/Shop";
@@ -9,10 +9,16 @@ import ManageProducts from "../Pages/Dashboard/ManageProducts/ManageProducts";
 import ManageContent from "../Pages/Dashboard/ManageContent/ManageContent";
 import ManageOrders from "../Pages/Dashboard/Orders/Orders";
 import Dashboard from "../Pages/Dashboard/Dashboard";
-import Settings from "../Pages/Dashboard/Settings/Settings";
+
 import ProductDetails from "../Pages/ProductDetails/ProductDetails";
 import Checkout from "../Pages/Checkout/Checkout";
 import Cart from "../Pages/Cart/Cart";
+import Categories from "../Pages/Categories/Categories";
+import Customize from "../Pages/Customize/Customize";
+import Profile from "../Pages/User/Profile";
+import OrderHistory from "../Pages/User/OrderHistory";
+import UserLayout from "../Components/UserLayout";
+import ProtectedRoute from "./ProtectedRoute";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -31,6 +37,8 @@ export const router = createBrowserRouter([
         path: "/shop/:id",
         element: <ProductDetails />,
       },
+      { path: "/categories", element: <Categories /> },
+      { path: "/customize", element: <Customize /> },
       {
         path: "/cart",
         element: <Cart />,
@@ -39,11 +47,27 @@ export const router = createBrowserRouter([
         path: "/checkout",
         element: <Checkout />,
       },
+      {
+        path: "user",
+        element: <UserLayout />,
+        children: [
+          { index: true, element: <Navigate to="profile" replace /> },
+
+          { path: "profile", element: <Profile /> },
+          { path: "order", element: <OrderHistory /> },
+        ],
+      },
 
       {
         path: "/dashboard",
-        element: <Dashboard></Dashboard>,
+
+        element: (
+          <ProtectedRoute requiredRole="admin">
+            <Dashboard></Dashboard>
+          </ProtectedRoute>
+        ),
         children: [
+          { index: true, element: <Navigate to="add-product" replace /> },
           {
             path: "add-product",
             element: <AddProduct />,
@@ -68,11 +92,6 @@ export const router = createBrowserRouter([
           {
             path: "manage-content",
             element: <ManageContent />,
-          },
-
-          {
-            path: "settings",
-            element: <Settings />,
           },
         ],
       },

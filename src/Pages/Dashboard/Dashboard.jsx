@@ -20,8 +20,6 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <div className="flex-1">
-        {/* <DashboardNav handleDrawerToggle={handleDrawerToggle} /> */}
-
         <div className="pl-16 ">
           <Outlet />
         </div>

@@ -8,31 +8,41 @@ import { PiConfetti } from "react-icons/pi";
 import { IoPersonOutline } from "react-icons/io5";
 import { AiOutlineProduct } from "react-icons/ai";
 import { BsBox } from "react-icons/bs";
-import { BiCaretRightSquare } from "react-icons/bi";
+import { BiArrowBack, BiCaretRightSquare } from "react-icons/bi";
 
 const sidebarMenu = {
-  customer: [
-    { name: "Dashboard", path: "", icon: <SlHome /> },
-    { name: "Orders", path: "orders", icon: <GoHistory /> },
-    { name: "Wishlist", path: "wishlist", icon: <CiMedal /> },
-    { name: "Settings", path: "settings", icon: <CiSettings /> },
-  ],
   admin: [
-    { name: "Add Product", path: "add-product", icon: <CiCirclePlus /> },
-    { name: "Discounts", path: "manage-discounts", icon: <PiConfetti /> },
-    { name: "Manage Users", path: "manage-users", icon: <IoPersonOutline /> },
+    {
+      name: "Add Product",
+      path: "/dashboard/add-product",
+      icon: <CiCirclePlus />,
+    },
+    {
+      name: "Discounts",
+      path: "/dashboard/manage-discounts",
+      icon: <PiConfetti />,
+    },
+    {
+      name: "Manage Users",
+      path: "/dashboard/manage-users",
+      icon: <IoPersonOutline />,
+    },
     {
       name: "Manage Products",
-      path: "manage-products",
+      path: "/dashboard/manage-products",
       icon: <AiOutlineProduct />,
     },
     { name: "Manage Orders", path: "manage-orders", icon: <BsBox /> },
     {
       name: "Manage Content",
-      path: "manage-content",
+      path: "/dashboard/manage-content",
       icon: <BiCaretRightSquare />,
     },
-    { name: "Settings", path: "settings", icon: <CiSettings /> },
+    {
+      name: "Back To Home",
+      path: "/",
+      icon: <BiArrowBack />,
+    },
   ],
 };
 
@@ -59,7 +69,7 @@ const Sidebar = ({ userRole, mobileOpen, handleDrawerToggle }) => {
           return (
             <Link
               key={index}
-              to={`/dashboard/${item.path}`}
+              to={`${item.path}`}
               className={`flex items-center gap-3 px-4 py-3 my-1 mx-2 rounded-lg transition duration-200 ${
                 isActive ? "bg-orange-500 text-white" : "hover:bg-gray-700"
               }`}

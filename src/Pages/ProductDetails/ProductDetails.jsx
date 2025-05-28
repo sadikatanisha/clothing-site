@@ -1,16 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useGetProductDetailsQuery } from "../../redux/apiSlice";
 import { addToCart } from "../../redux/cartSlice";
+
 const ProductDetails = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
-  console.log(id);
   const { data: product, isLoading, error } = useGetProductDetailsQuery(id);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
+
+  useEffect(() => {
+    if (product) {
+      if (product.availableColors && product.availableColors.length > 0) {
+        setSelectedColor(product.availableColors[0].hex);
+      }
+      if (product.availableSizes && product.availableSizes.length > 0) {
+        setSelectedSize(product.availableSizes[0]);
+      }
+    }
+  }, [product]);
 
   if (isLoading) return <div className="text-center py-8">Loading...</div>;
   if (error)
@@ -19,6 +31,7 @@ const ProductDetails = () => {
     );
   if (!product)
     return <div className="text-center py-8">Product not found</div>;
+
   const handleAddToCart = (product) => {
     const payload = {
       _id: product._id,
@@ -26,9 +39,13 @@ const ProductDetails = () => {
       image: product.images[0]?.url,
       price: product.discountPrice ?? product.price,
       quantity: 1,
+      // you could also include selectedColor / selectedSize in payload if needed
+      // color: selectedColor,
+      // size: selectedSize,
     };
     dispatch(addToCart(payload));
   };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -115,9 +132,8 @@ const ProductDetails = () => {
               <h3 className="font-medium">Colors</h3>
               <div className="flex gap-2">
                 {product.availableColors.map((color) => (
-                  <div className="flex flex-col justify-center items-center ">
+                  <div key={color.hex} className="flex flex-col items-center">
                     <button
-                      key={color.hex}
                       onClick={() => setSelectedColor(color.hex)}
                       className={`w-8 h-8 rounded-full border-2 ${
                         selectedColor === color.hex
@@ -145,7 +161,7 @@ const ProductDetails = () => {
                     onClick={() => setSelectedSize(size)}
                     className={`px-4 py-2 rounded-md ${
                       selectedSize === size
-                        ? "bg-blue-500 text-white"
+                        ? "bg-[#800f2f] text-white"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >
@@ -196,7 +212,7 @@ const ProductDetails = () => {
           <div className="flex gap-4">
             <button
               onClick={() => handleAddToCart(product)}
-              className="mt-3 w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition"
+              className="mt-3 w-full bg-[#800f2f] text-white py-2 rounded hover:bg-gray-800 transition"
             >
               Add to Cart
             </button>

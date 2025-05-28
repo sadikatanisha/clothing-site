@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useGetAdminProductsQuery } from "../../redux/apiSlice";
 import { addToCart } from "../../redux/cartSlice";
 import { Link } from "react-router-dom";
-
+import ProductCard from "../../Components/ProductCard";
 const Shop = () => {
   const dispatch = useDispatch();
   const { data: products, isLoading } = useGetAdminProductsQuery();
@@ -127,44 +127,9 @@ const Shop = () => {
         {isLoading ? (
           <div className="text-center text-gray-500">Loading products...</div>
         ) : sortedProducts?.length ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-16">
             {sortedProducts.map((product) => (
-              <Link to={`/shop/${product._id}`}>
-                <div
-                  key={product._id}
-                  className="rounded-lg p-4 hover:shadow-sm transition border border-gray-100"
-                >
-                  <img
-                    src={product.images[0]?.url}
-                    alt={product.name}
-                    className="h-48 w-full object-cover rounded"
-                  />
-                  <h3 className="mt-2 font-semibold text-lg">{product.name}</h3>
-                  <p className="text-sm text-gray-600 truncate">
-                    {product.description}
-                  </p>
-                  <div className="mt-2 text-sm font-medium">
-                    {product.discountPrice ? (
-                      <>
-                        <span className="line-through text-gray-400">
-                          ৳{product.price}
-                        </span>{" "}
-                        <span className="text-red-500">
-                          ৳{product.discountPrice}
-                        </span>
-                      </>
-                    ) : (
-                      <span>৳{product.price}</span>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => handleAddToCart(product)}
-                    className="mt-3 w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition"
-                  >
-                    Add to Cart
-                  </button>
-                </div>{" "}
-              </Link>
+              <ProductCard key={product._id} product={product} />
             ))}
           </div>
         ) : (
