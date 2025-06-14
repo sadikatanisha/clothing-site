@@ -6,8 +6,7 @@ import "slick-carousel/slick/slick-theme.css";
 
 const Banner = () => {
   const { data, isLoading, isError, error } = useGetBannerQuery();
-  console.log(data);
-  // Default banner configuration
+
   const defaultBanner = {
     image:
       "https://via.placeholder.com/1920x500.png?text=Summer+Collection+2024",
@@ -47,7 +46,7 @@ const Banner = () => {
   const banners = data?.length > 0 ? data : [defaultBanner];
 
   return (
-    <div className="relative w-full h-[560px] bg-gray-100 overflow-hidden">
+    <div className="relative w-full h-[580px] bg-gray-100 overflow-hidden">
       {banners.length > 1 ? (
         <Slider {...sliderSettings}>
           {banners.map((banner, index) => (
@@ -62,7 +61,7 @@ const Banner = () => {
 };
 
 const BannerSlide = ({ banner }) => (
-  <div className="relative w-full h-[500px] flex items-center justify-center">
+  <div className="relative w-full h-[550px] flex items-center justify-center">
     <img
       src={banner.image}
       alt="Fashion Model"
@@ -73,7 +72,7 @@ const BannerSlide = ({ banner }) => (
         {banner.header}
       </h1>
       <p className="text-lg mb-6">{banner.subHeader}</p>
-      <button className="font-semibold py-3 px-6 rounded-full shadow-md border-2 bg-[#800f2f] hover:bg-[#f4f3ee] text-white hover:text-gray-900 border-white hover:border-[#800f2f] transition-all">
+      <button className="font-semibold py-3 px-6 rounded-full shadow-md border-2 bg-[#800f44] hover:bg-[#f4f3ee] text-white hover:text-gray-900 border-white hover:border-[#800f44] transition-all">
         Shop Now
       </button>
     </div>

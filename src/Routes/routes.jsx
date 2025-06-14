@@ -19,6 +19,9 @@ import Profile from "../Pages/User/Profile";
 import OrderHistory from "../Pages/User/OrderHistory";
 import UserLayout from "../Components/UserLayout";
 import ProtectedRoute from "./ProtectedRoute";
+import About from "../Pages/About/About";
+import TermsAndConditions from "../Pages/TermsAndConditions/TermsAndConditions";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -47,6 +50,8 @@ export const router = createBrowserRouter([
         path: "/checkout",
         element: <Checkout />,
       },
+      { path: "/about", element: <About /> },
+      { path: "/terms-and-conditions", element: <TermsAndConditions /> },
       {
         path: "user",
         element: <UserLayout />,

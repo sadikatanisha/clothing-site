@@ -1,4 +1,3 @@
-// SignupForm.js
 import React, { useState, useContext } from "react";
 import { AuthContext } from "../provider/AuthProvider";
 import { toast, ToastContainer } from "react-toastify";
@@ -96,7 +95,7 @@ const SignupForm = ({ onClose, onSwitchToLogin }) => {
         <button
           type="submit"
           disabled={loading}
-          className="bg-black text-white py-2 rounded-lg hover:bg-white hover:text-black border-2 transition"
+          className="bg-[#800f44] text-white py-2 rounded-lg hover:bg-white hover:text-black hover:border-[#800f44] border-2 transition"
         >
           {loading ? "Signing up..." : "Sign Up"}
         </button>

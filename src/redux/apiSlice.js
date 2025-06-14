@@ -51,6 +51,10 @@ export const apiSlice = createApi({
         body: formData,
       }),
     }),
+    getOrderHistory: builder.query({
+      query: () => "/user/order-history",
+    }),
+
     // ADMIN
     createProduct: builder.mutation({
       query: (formData) => ({
@@ -180,7 +184,6 @@ export const apiSlice = createApi({
         { type: "Coupons", id: "LIST" },
       ],
     }),
-
     // Coupon --> User
     getActiveCoupon: builder.query({
       query: () => `/user/active-coupon`,
@@ -196,6 +199,7 @@ export const {
   useGetFeaturedProductsQuery,
   useCreateOrderMutation,
   useGetMydataQuery,
+  useGetOrderHistoryQuery,
   // ADMIN product
   useCreateProductMutation,
   useUpdateProductMutation,

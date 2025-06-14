@@ -30,7 +30,6 @@ const LoginForm = ({ onClose, onSwitchToSignup }) => {
     }
   };
 
-  // 👇 also add email/password state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -62,7 +61,7 @@ const LoginForm = ({ onClose, onSwitchToSignup }) => {
         <button
           type="submit"
           disabled={loading}
-          className="bg-black border-2 text-white py-2 rounded-lg hover:bg-white hover:border-2 hover:text-black transition"
+          className="bg-[#800f44] border-2 text-white py-2 rounded-lg hover:bg-white hover:border-2 hover:border-[#800f44] hover:text-black transition"
         >
           {loading ? "Logging in..." : "Login"}
         </button>

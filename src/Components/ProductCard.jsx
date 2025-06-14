@@ -1,9 +1,14 @@
+// src/components/ProductCard.jsx
 import React from "react";
 import { addToCart } from "../redux/cartSlice";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
+
   const handleAddToCart = () => {
     const payload = {
       _id: product._id,
@@ -13,11 +18,21 @@ const ProductCard = ({ product }) => {
       quantity: 1,
     };
     dispatch(addToCart(payload));
+
+    toast.success("Added to cart", {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
   };
+
   return (
     <div
       key={product._id}
-      className="bg-white rounded-lg overflow-hidden  transition flex flex-col"
+      className="bg-white rounded-lg overflow-hidden transition flex flex-col"
     >
       {/* Image: taller than wide */}
       <div className="w-full h-96 overflow-hidden">

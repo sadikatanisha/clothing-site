@@ -1,11 +1,16 @@
+// src/components/ProductDetails.jsx
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useGetProductDetailsQuery } from "../../redux/apiSlice";
 import { addToCart } from "../../redux/cartSlice";
+import FeaturedProducts from "../../Components/HomeComponents/FeaturedProducts";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProductDetails = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { id } = useParams();
   const { data: product, isLoading, error } = useGetProductDetailsQuery(id);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -32,18 +37,48 @@ const ProductDetails = () => {
   if (!product)
     return <div className="text-center py-8">Product not found</div>;
 
+  const buildCartPayload = (product) => ({
+    _id: product._id,
+    name: product.name,
+    image: product.images[0]?.url,
+    price: product.discountPrice ?? product.price,
+    quantity: 1,
+    color: selectedColor,
+    size: selectedSize,
+  });
+
   const handleAddToCart = (product) => {
-    const payload = {
-      _id: product._id,
-      name: product.name,
-      image: product.images[0]?.url,
-      price: product.discountPrice ?? product.price,
-      quantity: 1,
-      // you could also include selectedColor / selectedSize in payload if needed
-      // color: selectedColor,
-      // size: selectedSize,
-    };
+    const payload = buildCartPayload(product);
     dispatch(addToCart(payload));
+
+    toast.success("Added to cart", {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+  };
+
+  const handleBuyNow = (product) => {
+    const payload = buildCartPayload(product);
+    dispatch(addToCart(payload));
+
+    toast.success("Proceeding to cart", {
+      position: "top-center",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      style: {
+        background: "#800f44",
+        color: "#ffffff",
+      },
+    });
+
+    navigate("/cart");
   };
 
   return (
@@ -65,7 +100,7 @@ const ProductDetails = () => {
                 onClick={() => setCurrentImageIndex(index)}
                 className={`shrink-0 w-20 h-20 rounded-lg border-2 ${
                   index === currentImageIndex
-                    ? "border-blue-500"
+                    ? "border-[#800f44]"
                     : "border-transparent"
                 } overflow-hidden`}
               >
@@ -90,15 +125,15 @@ const ProductDetails = () => {
                 <span className="text-2xl font-bold">
                   {product.discountPrice ? (
                     <>
-                      <span className="text-red-600">
-                        ${product.discountPrice}
+                      <span className="text-black font-bold">
+                        ৳ {product.discountPrice}
                       </span>
                       <span className="ml-2 text-gray-400 line-through">
-                        ${product.price}
+                        ৳ {product.price}
                       </span>
                     </>
                   ) : (
-                    `$${product.price}`
+                    `৳ ${product.price}`
                   )}
                 </span>
               </div>
@@ -137,7 +172,7 @@ const ProductDetails = () => {
                       onClick={() => setSelectedColor(color.hex)}
                       className={`w-8 h-8 rounded-full border-2 ${
                         selectedColor === color.hex
-                          ? "border-blue-500"
+                          ? "border-[#800f44]"
                           : "border-gray-200"
                       }`}
                       style={{ backgroundColor: color.hex }}
@@ -161,7 +196,7 @@ const ProductDetails = () => {
                     onClick={() => setSelectedSize(size)}
                     className={`px-4 py-2 rounded-md ${
                       selectedSize === size
-                        ? "bg-[#800f2f] text-white"
+                        ? "bg-[#800f44] text-white"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >
@@ -172,49 +207,18 @@ const ProductDetails = () => {
             </div>
           )}
 
-          {/* Customization Options */}
-          {product.isCustomizable &&
-            product.customizationOptions?.map((option, index) => (
-              <div key={index} className="space-y-2">
-                <label className="font-medium">{option.optionName}</label>
-                {option.optionType === "text" && (
-                  <input
-                    type="text"
-                    className="w-full p-2 border rounded-md"
-                    required={option.required}
-                  />
-                )}
-                {option.optionType === "number" && (
-                  <input
-                    type="number"
-                    className="w-full p-2 border rounded-md"
-                    required={option.required}
-                  />
-                )}
-                {option.optionType === "color" && (
-                  <input
-                    type="color"
-                    className="w-16 h-10"
-                    required={option.required}
-                  />
-                )}
-                {option.optionType === "image" && (
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="w-full"
-                    required={option.required}
-                  />
-                )}
-              </div>
-            ))}
-
-          <div className="flex gap-4">
+          <div className="flex flex-col gap-4">
             <button
               onClick={() => handleAddToCart(product)}
-              className="mt-3 w-full bg-[#800f2f] text-white py-2 rounded hover:bg-gray-800 transition"
+              className="mt-3 w-full bg-[#800f44] text-white py-2 rounded hover:bg-[#5f0933] transition"
             >
               Add to Cart
+            </button>
+            <button
+              onClick={() => handleBuyNow(product)}
+              className="w-full border border-[#800f44] text-[#800f44] py-2 rounded hover:bg-[#800f44] hover:text-white transition"
+            >
+              Buy Now
             </button>
           </div>
 
@@ -227,15 +231,10 @@ const ProductDetails = () => {
                 </span>
               ))}
             </div>
-            <div className="mt-4 text-sm text-gray-500">
-              <p>
-                Rating: {product.rating}/5 ({product.numReviews} reviews)
-              </p>
-              <p>Sales: {product.sales || 0} sold</p>
-            </div>
           </div>
         </div>
       </div>
+      <FeaturedProducts />
     </div>
   );
 };

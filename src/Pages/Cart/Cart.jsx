@@ -97,7 +97,7 @@ const Cart = () => {
         <p className="text-xl font-semibold">Total: ${totalPrice.toFixed(2)}</p>
         <Link
           to="/checkout"
-          className="mt-4 sm:mt-0 px-6 py-2 bg-black text-white rounded hover:bg-gray-800 transition"
+          className="mt-4 sm:mt-0 px-6 py-2 bg-[#800f44] text-white rounded hover:bg-gray-800 transition"
         >
           Checkout
         </Link>

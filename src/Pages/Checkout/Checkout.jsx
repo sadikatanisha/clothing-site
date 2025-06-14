@@ -53,7 +53,6 @@ const Checkout = () => {
   const handlePaymentChange = (e) => setPaymentMethod(e.target.value);
 
   const handlePlaceOrder = async () => {
-    // Basic validation
     if (!firstName || !lastName || !contactNo || !address || !city) {
       alert("Please fill out all required customer information.");
       return;

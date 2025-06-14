@@ -58,7 +58,7 @@ const Sidebar = ({ userRole, mobileOpen, handleDrawerToggle }) => {
       }`}
     >
       <div className="flex justify-between items-center p-4 border-b border-gray-700">
-        {isExpanded && <h1 className="text-xl font-bold">E-Shop</h1>}
+        {isExpanded && <h1 className="text-xl font-bold">Admin Dashboard</h1>}
         <button onClick={() => setIsExpanded(!isExpanded)} className="text-xl">
           {isExpanded ? <FiChevronLeft /> : <FiChevronRight />}
         </button>
@@ -71,7 +71,7 @@ const Sidebar = ({ userRole, mobileOpen, handleDrawerToggle }) => {
               key={index}
               to={`${item.path}`}
               className={`flex items-center gap-3 px-4 py-3 my-1 mx-2 rounded-lg transition duration-200 ${
-                isActive ? "bg-orange-500 text-white" : "hover:bg-gray-700"
+                isActive ? "bg-[#800f2f] text-white" : "hover:bg-gray-700"
               }`}
               onClick={handleDrawerToggle}
             >
