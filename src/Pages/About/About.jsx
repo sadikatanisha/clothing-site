@@ -1,9 +1,9 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const About = () => {
   return (
     <div className="bg-white text-gray-800">
-      {/* Hero Section */}
       <section className="bg-[#800f44] text-white py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl sm:text-5xl font-extrabold mb-4">
@@ -15,7 +15,6 @@ const About = () => {
         </div>
       </section>
 
-      {/* Our Story */}
       <section className="py-16 px-4 sm:px-10">
         <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-center gap-8">
           <div className="lg:w-1/2">
@@ -121,12 +120,12 @@ const About = () => {
           <p className="text-gray-200 mb-6">
             Browse our exclusive collections and find your one-of-a-kind piece.
           </p>
-          <a
-            href="/shop"
+          <Link
+            to="/shop"
             className="inline-block bg-white text-[#800f44] font-semibold px-8 py-3 rounded-md hover:bg-gray-100 transition"
           >
             Shop Now
-          </a>
+          </Link>
         </div>
       </section>
     </div>
